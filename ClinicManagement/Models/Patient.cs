@@ -59,6 +59,11 @@ namespace ClinicManagement.Models
         /// </summary>
         public DateTime CreatedAt { get; set; }
 
+        /// <summary>
+        /// Indicates whether the patient record is marked as deleted(soft delete support)
+        /// </summary>
+        public bool IsDeleted { get; set; }
+
         // Navigation property : One-To-Many relationship with Appointment
         /// <summary>
         /// Navigtion property for the appointments related to this patient
