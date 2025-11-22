@@ -13,6 +13,7 @@ builder.Services.AddDbContext<ClinicManagementDbContext>(options =>
 // Register your repository and unit of work here
 builder.Services.AddScoped<IPatientRepository, PatientRepository>();
 builder.Services.AddScoped<IAppointmentRepository, AppointmentRepository>();
+builder.Services.AddScoped<IDoctorRepository, DoctorRepository>();
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
