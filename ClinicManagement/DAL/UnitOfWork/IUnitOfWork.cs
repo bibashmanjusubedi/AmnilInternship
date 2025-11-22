@@ -25,6 +25,11 @@ namespace ClinicManagement.DAL.UnitOfWork
         IDoctorRepository Doctors { get; }
 
         /// <summary>
+        /// Gets the doctor schedule repository for managing doctor schedule-related data operations.
+        /// </summary>
+        IDoctorScheduleRepository DoctorSchedules { get; }
+
+        /// <summary>
         /// Asynchronously saves all pending changes made in the context to the database.
         /// Commits all transactional changes across repositories.
         /// </summary>

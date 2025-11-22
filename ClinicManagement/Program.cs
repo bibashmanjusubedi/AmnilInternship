@@ -14,6 +14,7 @@ builder.Services.AddDbContext<ClinicManagementDbContext>(options =>
 builder.Services.AddScoped<IPatientRepository, PatientRepository>();
 builder.Services.AddScoped<IAppointmentRepository, AppointmentRepository>();
 builder.Services.AddScoped<IDoctorRepository, DoctorRepository>();
+builder.Services.AddScoped<IDoctorScheduleRepository, DoctorScheduleRepository>();
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 

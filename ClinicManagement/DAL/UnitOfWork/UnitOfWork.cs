@@ -27,6 +27,11 @@ namespace ClinicManagement.DAL.UnitOfWork
         /// </summary>
         public IDoctorRepository Doctors { get; }
 
+        /// <summary>
+        /// Gets the doctor schedule repository for handling doctor schedule entity operations.
+        /// </summary>
+        public IDoctorScheduleRepository DoctorSchedules { get; }
+
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UnitOfWork"/> class with the specified database context and repositories.
@@ -35,12 +40,14 @@ namespace ClinicManagement.DAL.UnitOfWork
         /// <param name="patientRepository">The patient repository instance for patient data operations.</param>
         /// <param name="appointmentRepository">The appointment repository instance for appointment data operations.</param>
         /// <param name="doctorRepository">The doctor repository instance for doctor data operations.</param>
-        public UnitOfWork(ClinicManagementDbContext context, IPatientRepository patientRepository,IAppointmentRepository appointmentRepository, IDoctorRepository doctorRepository)
+        /// <param name="doctorScheduleRepository">The doctor schedule repository instance for schedule data operations.</param>
+        public UnitOfWork(ClinicManagementDbContext context, IPatientRepository patientRepository,IAppointmentRepository appointmentRepository, IDoctorRepository doctorRepository, IDoctorScheduleRepository doctorScheduleRepository)
         {
             _context = context;
             Patients = patientRepository;
             Appointments = appointmentRepository;
             Doctors = doctorRepository;
+            DoctorSchedules = doctorScheduleRepository;
         }
 
         /// <summary>
