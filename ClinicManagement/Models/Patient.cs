@@ -69,6 +69,6 @@ namespace ClinicManagement.Models
         /// Navigtion property for the appointments related to this patient
         /// Represents a collection of appointments that belong to the patient
         /// </summary>
-        public ICollection<Appointment> Appointments { get; set; }
+        public ICollection<Appointment> Appointments { get; set; } = new List<Appointment>();
     }
 }
