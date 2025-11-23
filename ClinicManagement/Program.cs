@@ -3,8 +3,17 @@ using Microsoft.EntityFrameworkCore;
 using Npgsql.EntityFrameworkCore.PostgreSQL;
 using ClinicManagement.DAL.Repositories;
 using ClinicManagement.DAL.UnitOfWork;
+using Serilog;
+
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .WriteTo.File("logs/deletions.txt", rollingInterval: RollingInterval.Day)
+    .CreateLogger(); // console logging
 
 var builder = WebApplication.CreateBuilder(args);
+
+//builder.Host.UseSerilog(); // for Serilog styleed console uncomment it...for default console dont use it 
+
 
 builder.Services.AddDbContext<ClinicManagementDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))

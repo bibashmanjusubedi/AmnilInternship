@@ -4,6 +4,7 @@ using ClinicManagement.DAL.UnitOfWork;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using ClinicManagement.DTOs.PatientRequests;
+using Serilog;
 
 namespace ClinicManagement.Controllers
 {
@@ -113,9 +114,18 @@ namespace ClinicManagement.Controllers
         /// Soft deletes a patient record (marks as deleted, does not remove from DB).
         /// </summary>
         [HttpDelete("{id}")]
-        public async Task<IActionResult> SoftDeletePatient(int id)
+        public async Task<IActionResult> SoftDeletePatient(int id,[FromBody] SoftDeletePatientDto dto)
         {
-            await _unitOfWork.Patients.SoftDeleteAsync(id);
+            var patient = await _unitOfWork.Patients.GetByIdAsync(id);
+            if (patient == null) return NotFound();
+
+            patient.IsDeleted = true;
+
+            Log.Information("Patient with ID {PatientId} marked as deleted at {DeletedAt}", patient.Id,dto.DeletedAt);
+
+
+
+            await _unitOfWork.Patients.UpdateAsync(patient);
             await _unitOfWork.SaveChangesAsync();
             return NoContent();
         }
