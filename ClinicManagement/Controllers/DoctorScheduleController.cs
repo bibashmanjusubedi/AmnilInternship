@@ -86,10 +86,21 @@ namespace ClinicManagement.Controllers
         /// <returns>A list of schedules for the specified doctor.</returns>
         // GET: api/DoctorSchedule/ByDoctor/5
         [HttpGet("ByDoctor/{doctorId}")]
-        public async Task<ActionResult<IEnumerable<DoctorSchedule>>> GetByDoctor(int doctorId)
+        public async Task<ActionResult<IEnumerable<DoctorScheduleByDoctorDto>>> GetByDoctor(int doctorId)
         {
             var schedules = await _unitOfWork.DoctorSchedules.GetByDoctorIdAsync(doctorId);
-            return Ok(schedules);
+
+            var dtoList = schedules.Select(s => new DoctorScheduleByDoctorDto
+            {
+                Id = s.Id,
+                DoctorId = s.DoctorId,
+                DayOfWeek = s.DayOfWeek,
+                StartTime = s.StartTime,
+                EndTime = s.EndTime,
+                DoctorName = s.Doctor?.FullName
+            });
+
+            return Ok(dtoList);
         }
 
         /// <summary>
@@ -156,9 +167,9 @@ namespace ClinicManagement.Controllers
         /// <returns>A response indicating the result of the delete operation.</returns>
         // DELETE: api/DoctorSchedule/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult> Delete(int id)
+        public async Task<ActionResult> Delete([FromBody] DeleteDoctorScheduleDto dto)
         {
-            var schedule = await _unitOfWork.DoctorSchedules.GetByIdAsync(id);
+            var schedule = await _unitOfWork.DoctorSchedules.GetByIdAsync(dto.Id);
             if (schedule == null)
                 return NotFound();
 

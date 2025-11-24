@@ -39,6 +39,7 @@ namespace ClinicManagement.DAL.Repositories
         public async Task<IEnumerable<DoctorSchedule>> GetByDoctorIdAsync(int doctorId)
         {
             return await _context.DoctorSchedules
+                .Include(ds => ds.Doctor)
                 .Where(ds => ds.DoctorId == doctorId)
                 .ToListAsync();
         }
