@@ -60,13 +60,23 @@ namespace ClinicManagement.Controllers
         /// <returns>The doctor schedule matching the provided ID.</returns>
         // GET: api/DoctorSchedule/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<DoctorSchedule>> GetById(int id)
+        public async Task<ActionResult<DoctorScheduleDetailDto>> GetById(int id)
         {
             var schedule = await _unitOfWork.DoctorSchedules.GetByIdAsync(id);
             if (schedule == null)
                 return NotFound();
 
-            return Ok(schedule);
+            var dto = new DoctorScheduleDetailDto
+            {
+                Id = schedule.Id,
+                DoctorId = schedule.DoctorId,
+                DayOfWeek = schedule.DayOfWeek,
+                StartTime = schedule.StartTime,
+                EndTime = schedule.EndTime,
+                DoctorName = schedule.Doctor?.FullName // Doctor Name for a partiular doctor schedule
+            };
+
+            return Ok(dto);
         }
 
         /// <summary>

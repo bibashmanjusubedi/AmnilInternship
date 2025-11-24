@@ -26,7 +26,7 @@ namespace ClinicManagement.DAL.Repositories
         /// <inheritdoc/>
         public async Task<DoctorSchedule> GetByIdAsync(int id)
         {
-            return await _context.DoctorSchedules.FindAsync(id);
+            return await _context.DoctorSchedules.Include(ds => ds.Doctor).FirstOrDefaultAsync(ds => ds.Id == id);
         }
 
         /// <inheritdoc/>
