@@ -46,5 +46,15 @@ namespace ClinicManagement.DAL.Repositories
         /// <param name="id">The unique identifier of the doctor to delete.</param>
         /// <returns>A task that represents the asynchronous delete operation.</returns>
         Task DeleteDoctorAsync(int id);
+
+        /// <summary>
+        /// Asynchronously checks if a doctor with the specified ID exists in the database.
+        /// </summary>
+        /// <param name="id">The unique identifier of the doctor to check.</param>
+        /// <returns>
+        /// A task that represents the asynchronous operation. 
+        /// The task result contains <c>true</c> if a doctor with the given ID exists; otherwise, <c>false</c>.
+        /// </returns>
+        Task<bool> ExistsAsync(int id);
     }
 }

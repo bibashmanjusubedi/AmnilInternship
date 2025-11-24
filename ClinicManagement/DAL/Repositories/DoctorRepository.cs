@@ -83,5 +83,18 @@ namespace ClinicManagement.DAL.Repositories
             }
         }
 
+        /// <summary>
+        /// Asynchronously checks if a doctor with the specified ID exists in the database.
+        /// </summary>
+        /// <param name="id">The unique identifier of the doctor to check.</param>
+        /// <returns>
+        /// A task that represents the asynchronous operation. 
+        /// The task result contains <c>true</c> if a doctor with the given ID exists; otherwise, <c>false</c>.
+        /// </returns>
+        public async Task<bool> ExistsAsync(int id)
+        {
+            return await _context.Doctors.AnyAsync(d => d.Id == id);
+        }
+
     }
 }

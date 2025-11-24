@@ -123,20 +123,25 @@ namespace ClinicManagement.Controllers
         /// <returns>A response indicating the result of the update operation.</returns>
         // PUT: api/DoctorSchedule/5
         [HttpPut("{id}")]
-        public async Task<ActionResult> Update(int id, DoctorSchedule updatedSchedule)
+        public async Task<ActionResult> Update(int id, UpdateDoctorScheduleDto dto)
         {
-            if (id != updatedSchedule.Id)
-                return BadRequest("ID mismatch");
 
             var existingSchedule = await _unitOfWork.DoctorSchedules.GetByIdAsync(id);
             if (existingSchedule == null)
                 return NotFound();
 
-            // Update properties (example)
-            existingSchedule.DayOfWeek = updatedSchedule.DayOfWeek;
-            existingSchedule.StartTime = updatedSchedule.StartTime;
-            existingSchedule.EndTime = updatedSchedule.EndTime;
-            existingSchedule.DoctorId = updatedSchedule.DoctorId;
+            // Validate that the DoctorId exists
+            var doctorExists = await _unitOfWork.Doctors.ExistsAsync(dto.DoctorId);
+            if (!doctorExists)
+            {
+                return BadRequest($"Doctor with ID {dto.DoctorId} does not exist.");
+            }
+
+            // Update properties
+            existingSchedule.DayOfWeek = dto.DayOfWeek;
+            existingSchedule.StartTime = dto.StartTime;
+            existingSchedule.EndTime = dto.EndTime;
+            existingSchedule.DoctorId = dto.DoctorId;
 
             _unitOfWork.DoctorSchedules.Update(existingSchedule);
             await _unitOfWork.SaveChangesAsync();
