@@ -6,6 +6,7 @@ using ClinicManagement.DAL;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using ClinicManagement.DAL.UnitOfWork;
+using ClinicManagement.DTOs.DoctorScheduleRequests;
 
 namespace ClinicManagement.Controllers
 {
@@ -35,10 +36,21 @@ namespace ClinicManagement.Controllers
         /// <returns>A list of all doctor schedules.</returns>
         // GET: api/DoctorSchedule
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<DoctorSchedule>>> GetAll()
+        public async Task<ActionResult<IEnumerable<DoctorScheduleAllDto>>> GetAll()
         {
             var schedules = await _unitOfWork.DoctorSchedules.GetAllAsync();
-            return Ok(schedules);
+
+            var result = schedules.Select(s => new DoctorScheduleAllDto
+            {
+                Id = s.Id,
+                DoctorId = s.DoctorId,
+                DoctorName = s.Doctor?.FullName,// If navigation property is available
+                DayOfWeek = s.DayOfWeek,
+                StartTime = s.StartTime,
+                EndTime = s.EndTime
+            }).ToList();
+
+            return Ok(result);
         }
 
         /// <summary>
@@ -77,8 +89,16 @@ namespace ClinicManagement.Controllers
         /// <returns>A response indicating the result of the create operation, along with the created schedule.</returns>
         // POST: api/DoctorSchedule
         [HttpPost]
-        public async Task<ActionResult> Create(DoctorSchedule schedule)
+        public async Task<ActionResult> Create([FromBody] CreateDoctorScheduleDto dto)
         {
+            var schedule = new DoctorSchedule
+            {
+                DoctorId = dto.DoctorId,
+                DayOfWeek = dto.DayOfWeek,
+                StartTime = dto.StartTime,
+                EndTime = dto.EndTime
+            };
+
             await _unitOfWork.DoctorSchedules.AddAsync(schedule);
             await _unitOfWork.SaveChangesAsync();
 

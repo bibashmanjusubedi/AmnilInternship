@@ -32,7 +32,7 @@ namespace ClinicManagement.DAL.Repositories
         /// <inheritdoc/>
         public async Task<IEnumerable<DoctorSchedule>> GetAllAsync()
         {
-            return await _context.DoctorSchedules.ToListAsync();
+            return await _context.DoctorSchedules.Include(ds => ds.Doctor).ToListAsync();
         }
         
         /// <inheritdoc/>
