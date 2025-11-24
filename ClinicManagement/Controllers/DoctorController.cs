@@ -4,6 +4,7 @@ using ClinicManagement.Models;
 using ClinicManagement.DAL.UnitOfWork;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using ClinicManagement.DTOs.DoctorRequests;
 
 namespace ClinicManagement.Controllers
 {
@@ -35,7 +36,15 @@ namespace ClinicManagement.Controllers
         public async Task<IActionResult> GetAllDoctors()
         {
             var doctors = await _unitOfWork.Doctors.GetAllDoctorsAsync();
-            return Ok(doctors);
+            var doctorsDtos = doctors.Select(d => new DoctorAllDto
+            {
+                Id = d.Id,
+                FullName = d.FullName,
+                Specialization = d.Specialization,
+                Email = d.Email,
+                Phone = d.Phone
+            }).ToList();
+            return Ok(doctorsDtos);
         }
 
         /// <summary>
@@ -51,7 +60,15 @@ namespace ClinicManagement.Controllers
             {
                 return NotFound();
             }
-            return Ok(doctor);
+            var doctorDto = new DoctorDetailDto
+            {
+                Id = doctor.Id,
+                FullName = doctor.FullName,
+                Specialization = doctor.Specialization,
+                Email = doctor.Email,
+                Phone = doctor.Phone
+            };
+            return Ok(doctorDto);
         }
 
         /// <summary>
@@ -61,10 +78,18 @@ namespace ClinicManagement.Controllers
         /// <returns>An <see cref="IActionResult"/> with the created doctor’s data and location.</returns>
         // POST: api/doctor
         [HttpPost]
-        public async Task<IActionResult> AddDoctor([FromBody] Doctor doctor)
+        public async Task<IActionResult> AddDoctor([FromBody] CreateDoctorDto dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
+
+            var doctor = new Doctor
+            {
+                FullName = dto.FullName,
+                Specialization = dto.Specialization,
+                Email = dto.Email,
+                Phone = dto.Phone
+            };
 
             await _unitOfWork.Doctors.AddDoctorAsync(doctor);
             await _unitOfWork.SaveChangesAsync();
@@ -80,19 +105,21 @@ namespace ClinicManagement.Controllers
         /// <returns>An <see cref="IActionResult"/> indicating the update result.</returns>
         // PUT : api/doctor/{id}
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateDoctor(int id, [FromBody] Doctor doctor)
+        public async Task<IActionResult> UpdateDoctor(int id, [FromBody] UpdateDoctorDto dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-
-            if (id != doctor.Id)
-                return BadRequest("Doctor ID mismatch.");
 
             var existingDoctor = await _unitOfWork.Doctors.GetDoctorByIdAsync(id);
             if (existingDoctor == null)
                 return NotFound();
 
-            await _unitOfWork.Doctors.UpdateDoctorAsync(doctor);
+            existingDoctor.FullName = dto.FullName;
+            existingDoctor.Specialization = dto.Specialization;
+            existingDoctor.Email = dto.Email;
+            existingDoctor.Phone = dto.Phone;
+
+            await _unitOfWork.Doctors.UpdateDoctorAsync(existingDoctor);
             await _unitOfWork.SaveChangesAsync();
 
             return NoContent();
@@ -105,13 +132,13 @@ namespace ClinicManagement.Controllers
         /// <returns>An <see cref="IActionResult"/> indicating the deletion result.</returns>
         // DELETE: api/doctor/{id}
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteDoctor(int id)
+        public async Task<IActionResult> DeleteDoctor([FromBody] DeleteDoctorDto dto)
         {
-            var existingDoctor = await _unitOfWork.Doctors.GetDoctorByIdAsync(id);
+            var existingDoctor = await _unitOfWork.Doctors.GetDoctorByIdAsync(dto.Id);
             if (existingDoctor == null)
                 return NotFound();
 
-            await _unitOfWork.Doctors.DeleteDoctorAsync(id);
+            await _unitOfWork.Doctors.DeleteDoctorAsync(dto.Id);
             await _unitOfWork.SaveChangesAsync();
 
             return NoContent();
