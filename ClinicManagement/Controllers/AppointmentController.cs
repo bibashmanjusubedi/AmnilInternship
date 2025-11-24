@@ -3,6 +3,7 @@ using ClinicManagement.Models;
 using ClinicManagement.DAL.UnitOfWork;
 using System;
 using System.Threading.Tasks;
+using ClinicManagement.DTOs.AppointmentRequests;
 
 namespace ClinicManagement.Controllers
 {
@@ -39,10 +40,17 @@ namespace ClinicManagement.Controllers
         /// </returns>
         // Receptionist/Admin: Create a new appointment
         [HttpPost]
-        public async Task<IActionResult> CreateAppointment([FromBody] Appointment appointment)
+        public async Task<IActionResult> CreateAppointment([FromBody] CreateAppointmentDto dto)
         {
-            appointment.CreatedAt = DateTime.UtcNow;
-            appointment.Status = AppointmentStatus.Scheduled;
+            var appointment = new Appointment
+            {
+                PatientId = dto.PatientId,
+                DoctorId = dto.DoctorId,
+                AppointmentDate = dto.AppointmentDate,
+                Description = dto.Description,
+                CreatedAt = DateTime.UtcNow,
+                Status = AppointmentStatus.Scheduled
+            };
             await _unitOfWork.Appointments.AddAsync(appointment);
             await _unitOfWork.SaveChangesAsync();
             return CreatedAtAction(nameof(GetAppointmentById), new { id = appointment.Id }, appointment);
