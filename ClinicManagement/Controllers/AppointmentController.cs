@@ -114,7 +114,19 @@ namespace ClinicManagement.Controllers
         public async Task<IActionResult> GetDoctorAppointments(int doctorId)
         {
             var appointments = await _unitOfWork.Appointments.GetByDoctorIdAsync(doctorId);
-            return Ok(appointments);
+
+            var appointmentDtos = appointments.Select(a => new AppointmentByDoctorDto
+            {
+                Id = a.Id,
+                PatientId = a.PatientId,
+                PatientName = a.Patient != null ? $"{a.Patient.FirstName} {a.Patient.LastName}" : "",
+                AppointmentDate = a.AppointmentDate,
+                Description = a.Description,
+                Status = a.Status,
+                CreatedAt = a.CreatedAt
+            }).ToList();
+
+            return Ok(appointmentDtos);
         }
 
         /// <summary>
@@ -181,7 +193,21 @@ namespace ClinicManagement.Controllers
         {
             var appointment = await _unitOfWork.Appointments.GetByIdAsync(id);
             if (appointment == null) return NotFound();
-            return Ok(appointment);
+
+            var dto = new AppointmentDetailDto
+            {
+                Id = appointment.Id,
+                PatientId = appointment.PatientId,
+                PatientName = appointment.Patient != null ? $"{appointment.Patient.FirstName} {appointment.Patient.LastName}" : "",
+                DoctorId = appointment.DoctorId,
+                DoctorName = appointment.Doctor?.FullName,
+                AppointmentDate = appointment.AppointmentDate,
+                Description = appointment.Description,
+                Status = appointment.Status,
+                CreatedAt = appointment.CreatedAt
+            };
+
+            return Ok(dto);
         }
     }
 }
