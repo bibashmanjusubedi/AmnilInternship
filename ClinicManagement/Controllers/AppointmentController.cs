@@ -4,6 +4,7 @@ using ClinicManagement.DAL.UnitOfWork;
 using System;
 using System.Threading.Tasks;
 using ClinicManagement.DTOs.AppointmentRequests;
+using System.Linq;
 
 namespace ClinicManagement.Controllers
 {
@@ -149,7 +150,21 @@ namespace ClinicManagement.Controllers
         public async Task<IActionResult> GetAllAppointments()
         {
             var appointments = await _unitOfWork.Appointments.GetAllAsync();
-            return Ok(appointments);
+
+            var appointmentDtos = appointments.Select(a => new AppointmentAllDto
+            {
+                Id = a.Id,
+                PatientId = a.PatientId,
+                PatientName = a.Patient != null ? $"{a.Patient.FirstName} {a.Patient.LastName}" : "",
+                DoctorId = a.DoctorId,
+                DoctorName = a.Doctor?.FullName,
+                AppointmentDate = a.AppointmentDate,
+                Description = a.Description,
+                Status = a.Status,
+                CreatedAt = a.CreatedAt
+            }).ToList();
+
+            return Ok(appointmentDtos);
         }
 
 
