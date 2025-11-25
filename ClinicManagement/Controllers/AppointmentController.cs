@@ -145,7 +145,7 @@ namespace ClinicManagement.Controllers
         /// </returns>
         // Doctor: Mark appointment as completed
         [HttpPut("{id}/complete")]
-        public async Task<IActionResult> MarkAppointmentCompleted(int id)
+        public async Task<IActionResult> MarkAppointmentCompleted(int id, [FromBody] MarkAppointmentCompleteDto dto)
         {
             var appointment = await _unitOfWork.Appointments.GetByIdAsync(id);
             if (appointment == null) return NotFound();
@@ -153,6 +153,12 @@ namespace ClinicManagement.Controllers
                 return BadRequest("Only scheduled appointments can be marked as completed.");
 
             appointment.Status = AppointmentStatus.Completed;
+
+            if (!string.IsNullOrEmpty(dto.CompletionNotes))
+            {
+                appointment.Description += "\nCompletion notes: " + dto.CompletionNotes;
+            }
+
             _unitOfWork.Appointments.Update(appointment);
             await _unitOfWork.SaveChangesAsync();
             return NoContent();
