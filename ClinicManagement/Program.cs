@@ -7,8 +7,14 @@ using Serilog;
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
-    .WriteTo.File("logs/deletions.txt", rollingInterval: RollingInterval.Day)
-    .CreateLogger(); // console logging
+    .WriteTo.Logger(lc => lc  // Logger for soft delete patient deletions
+        .Filter.ByIncludingOnly(evt => evt.Properties.ContainsKey("LogType") && evt.Properties["LogType"].ToString().Contains("Deletion"))
+        .WriteTo.File("logs/softDeletePatients.txt", rollingInterval: RollingInterval.Day))
+    .WriteTo.Logger(lc => lc  // Logger for cancellations
+        .Filter.ByIncludingOnly(evt => evt.Properties.ContainsKey("LogType") && evt.Properties["LogType"].ToString().Contains("Cancellation"))
+        .WriteTo.File("logs/appointmentCancellations.txt", rollingInterval: RollingInterval.Day))
+    .CreateLogger();
+
 
 var builder = WebApplication.CreateBuilder(args);
 

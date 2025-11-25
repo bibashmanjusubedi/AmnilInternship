@@ -5,6 +5,7 @@ using System;
 using System.Threading.Tasks;
 using ClinicManagement.DTOs.AppointmentRequests;
 using System.Linq;
+using Serilog;
 
 namespace ClinicManagement.Controllers
 {
@@ -89,7 +90,7 @@ namespace ClinicManagement.Controllers
         /// </returns>
         // Receptionist: Cancel an appointment
         [HttpPut("{id}/cancel")]
-        public async Task<IActionResult> CancelAppointment(int id)
+        public async Task<IActionResult> CancelAppointment(int id, [FromBody] AppointmentCancelDto dto)
         {
             var appointment = await _unitOfWork.Appointments.GetByIdAsync(id);
             if (appointment == null) return NotFound();
@@ -97,6 +98,12 @@ namespace ClinicManagement.Controllers
                 return BadRequest("Only scheduled appointments can be cancelled.");
 
             appointment.Status = AppointmentStatus.Cancelled;
+
+            Log.ForContext("LogType", "Cancellation")
+                .Information("Appointment {AppointmentId} cancelled. Reason: {Reason}", id, dto.CancellationReason);
+
+
+
             _unitOfWork.Appointments.Update(appointment);
             await _unitOfWork.SaveChangesAsync();
             return NoContent();

@@ -121,7 +121,8 @@ namespace ClinicManagement.Controllers
 
             patient.IsDeleted = true;
 
-            Log.Information("Patient with ID {PatientId} marked as deleted at {DeletedAt}", patient.Id,dto.DeletedAt);
+            Log.ForContext("LogType", "Deletion")
+                .Information("Patient with ID {PatientId} marked as deleted at {DeletedAt}", patient.Id,dto.DeletedAt);
 
 
 
