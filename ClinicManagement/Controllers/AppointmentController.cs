@@ -67,14 +67,14 @@ namespace ClinicManagement.Controllers
         /// </returns>
         // Receptionist: Reschedule an appointment
         [HttpPut("{id}/reschedule")]
-        public async Task<IActionResult> RescheduleAppointment(int id, [FromBody] DateTime newDate)
+        public async Task<IActionResult> RescheduleAppointment(int id, [FromBody] RescheduleAppointmentDto dto)
         {
             var appointment = await _unitOfWork.Appointments.GetByIdAsync(id);
             if (appointment == null) return NotFound();
             if (appointment.Status != AppointmentStatus.Scheduled)
                 return BadRequest("Cannot reschedule a completed or cancelled appointment.");
 
-            appointment.AppointmentDate = newDate;
+            appointment.AppointmentDate = dto.NewDate;
             _unitOfWork.Appointments.Update(appointment);
             await _unitOfWork.SaveChangesAsync();
             return NoContent();
