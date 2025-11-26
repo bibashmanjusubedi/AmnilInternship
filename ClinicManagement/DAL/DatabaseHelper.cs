@@ -1,16 +1,15 @@
 ﻿using ClinicManagement.Models;
 using Microsoft.EntityFrameworkCore;
-using ClinicManagement.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace ClinicManagement.DAL
 {
     /// <summary>
     /// Represents the database context for the Clinic Management system.
-    /// Manages the entity sets for patients, appointments, doctors, and doctor schedules.
+    /// Manages the entity sets for patients, appointments, doctors, and doctor schedules, and supports ASP.NET Identity.
     /// </summary>
-    public class ClinicManagementDbContext : DbContext
+    public class ClinicManagementDbContext : IdentityDbContext<ApplicationUser>
     {
-        // Implementation of the database context
         /// <summary>
         /// Initializes a new instance of the <see cref="ClinicManagementDbContext"/> class using the specified options.
         /// </summary>
