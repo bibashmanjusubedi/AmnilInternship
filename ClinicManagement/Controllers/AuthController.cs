@@ -11,6 +11,9 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace ClinicManagement.Controllers
 {
+    /// <summary>
+    /// Controller to handle authentication operations such as user registration, login, and role assignment.
+    /// </summary>
     [ApiController]
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
@@ -19,6 +22,12 @@ namespace ClinicManagement.Controllers
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IConfiguration _configuration;
 
+        /// <summary>
+        /// Constructor for AuthController.
+        /// </summary>
+        /// <param name="userManager">Manages user-related operations.</param>
+        /// <param name="signInManager">Handles user sign-in operations.</param>
+        /// <param name="configuration">Application configuration settings.</param>
         public AuthController(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
@@ -29,6 +38,12 @@ namespace ClinicManagement.Controllers
             _configuration = configuration;
         }
 
+
+        /// <summary>
+        /// Registers a new user, assigns the default "Receptionist" role, and returns basic user info and assigned roles.
+        /// </summary>
+        /// <param name="dto">Registration data transfer object.</param>
+        /// <returns>Basic user details and assigned roles if successful, error details otherwise.</returns>
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterDto dto)
         {
@@ -49,6 +64,9 @@ namespace ClinicManagement.Controllers
             // Assign default role Receptionist
             await _userManager.AddToRoleAsync(user, "Receptionist");
 
+            // fetch assigned role from backend
+            var roles = await _userManager.GetRolesAsync(user);
+
             return Ok(new
             {
                 message = "User registered successfully!",
@@ -56,7 +74,8 @@ namespace ClinicManagement.Controllers
                 {
                     user.Id,
                     user.Email,
-                    user.FullName
+                    user.FullName,
+                    roles
                 }
             });
 
@@ -64,6 +83,12 @@ namespace ClinicManagement.Controllers
 
         }
 
+
+        /// <summary>
+        /// Authenticates a user, generates a JWT token, and returns user info and roles.
+        /// </summary>
+        /// <param name="dto">Login data transfer object.</param>
+        /// <returns>JWT token, expiration, user details, and roles if authenticated; error otherwise.</returns>
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginDto dto)
         {
@@ -113,6 +138,12 @@ namespace ClinicManagement.Controllers
             });
         }
 
+
+        /// <summary>
+        /// Assigns a specified role to a user. Only accessible by Admins.
+        /// </summary>
+        /// <param name="dto">Assign role data transfer object.</param>
+        /// <returns>A success message if the role is assigned, or error details otherwise.</returns>
         [HttpPost("assign-role")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> AssignRole(AssignRoleDto dto)

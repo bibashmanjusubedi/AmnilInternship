@@ -16,5 +16,7 @@ namespace ClinicManagement.Models
         /// When the user account was created.
         /// </summary>
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+
     }
 }
