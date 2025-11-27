@@ -27,25 +27,13 @@ namespace ClinicManagement.DAL.Repositories
             _context = context;
         }
 
-        /// <summary>
-        /// Asynchronously adds a new appointment to the database.
-        /// </summary>
-        /// <param name="appointment">The appointment entity to add.</param>
-        /// <returns>A task that represents the asynchronous operation.</returns>
+        /// <inheritdoc/>
         public async Task AddAsync(Appointment appointment)
         {
             await _context.Appointments.AddAsync(appointment);
         }
 
-        /// <summary>
-        /// Asynchronously retrieves an appointment by its unique identifier,
-        /// including associated Patient and Doctor entities.
-        /// </summary>
-        /// <param name="appointmentId">The unique identifier of the appointment.</param>
-        /// <returns>
-        /// A task representing the asynchronous operation. The result contains
-        /// the <see cref="Appointment"/> entity if found, or null otherwise.
-        /// </returns>
+        /// <inheritdoc/>
         public async Task<Appointment> GetByIdAsync(int appointmentId)
         {
             return await _context.Appointments
@@ -54,15 +42,7 @@ namespace ClinicManagement.DAL.Repositories
                 .FirstOrDefaultAsync(a => a.Id == appointmentId);
         }
 
-        /// <summary>
-        /// Asynchronously retrieves all appointments for a specific doctor,
-        /// including associated Patient entities.
-        /// </summary>
-        /// <param name="doctorId">The unique identifier of the doctor.</param>
-        /// <returns>
-        /// A task representing the asynchronous operation. The result contains
-        /// a collection of <see cref="Appointment"/> entities for the doctor.
-        /// </returns>
+        /// <inheritdoc/>
         public async Task<IEnumerable<Appointment>> GetByDoctorIdAsync(int doctorId)
         {
             return await _context.Appointments
@@ -71,14 +51,7 @@ namespace ClinicManagement.DAL.Repositories
                 .ToListAsync();
         }
 
-        /// <summary>
-        /// Asynchronously retrieves all appointments in the system,
-        /// including associated Patient and Doctor entities.
-        /// </summary>
-        /// <returns>
-        /// A task representing the asynchronous operation. The result contains
-        /// a collection of all <see cref="Appointment"/> entities.
-        /// </returns>
+        /// <inheritdoc/>
         public async Task<IEnumerable<Appointment>> GetAllAsync()
         {
             return await _context.Appointments
@@ -87,21 +60,13 @@ namespace ClinicManagement.DAL.Repositories
                 .ToListAsync();
         }
 
-        /// <summary>
-        /// Updates an existing appointment entity in the database.
-        /// The appointment should be tracked by the current context.
-        /// </summary>
-        /// <param name="appointment">The appointment entity with updated values.</param>
+        /// <inheritdoc/>
         public void Update(Appointment appointment)
         {
             _context.Appointments.Update(appointment);
         }
 
-        /// <summary>
-        /// Removes an appointment entity from the database.
-        /// The appointment should be tracked by the current context.
-        /// </summary>
-        /// <param name="appointment">The appointment entity to remove.</param>
+        /// <inheritdoc/>
         public void Delete(Appointment appointment)
         {
             _context.Appointments.Remove(appointment);

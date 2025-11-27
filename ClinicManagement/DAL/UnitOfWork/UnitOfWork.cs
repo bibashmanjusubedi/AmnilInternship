@@ -50,13 +50,7 @@ namespace ClinicManagement.DAL.UnitOfWork
             DoctorSchedules = doctorScheduleRepository;
         }
 
-        /// <summary>
-        /// Asynchronously saves all changes made in repositories to the database as a single transaction.
-        /// </summary>
-        /// <returns>
-        /// A task representing the asynchronous save operation. 
-        /// The task result contains the number of state entries written to the database.
-        /// </returns>
+        /// <inheritdoc/>
         public Task<int> SaveChangesAsync()
         {
             return _context.SaveChangesAsync();

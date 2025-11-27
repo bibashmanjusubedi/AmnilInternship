@@ -25,34 +25,22 @@ namespace ClinicManagement.DAL.Repositories
             _context = context;
         }
 
-        /// <summary>
-        /// Asynchronously retrieves all patients that are not marked as deleted.
-        /// </summary>
-        /// <returns>A list of active <see cref="Patient"/> entities.</returns>
+        /// <inheritdoc/>
         public async Task<IEnumerable<Patient>> GetAllAsync()
         {
             return await _context.Patients.Where(p => !p.IsDeleted).ToListAsync();
         }
 
 
-        /// <summary>
-        /// Asynchronously retrieves a patient by their unique identifier, if not deleted.
-        /// </summary>
-        /// <param name="id">The unique identifier of the patient.</param>
-        /// <returns>The <see cref="Patient"/> if found and not deleted; otherwise, null.</returns>
+        /// <inheritdoc/>
         public async Task<Patient> GetByIdAsync(int id)
         {
             return await _context.Patients.FirstOrDefaultAsync(p => p.Id == id && !p.IsDeleted);
         }
 
 
-        /// <summary>
-        /// Asynchronously adds a new patient to the database.
-        /// Sets <see cref="Patient.CreatedAt"/> and <see cref="Patient.IsDeleted"/> flags automatically.
-        /// </summary>
-        /// <param name="patient">The <see cref="Patient"/> entity to add.</param>
-        /// <returns>A task representing the asynchronous operation.</returns>
 
+        /// <inheritdoc/>
         public async Task AddAsync(Patient patient)
         {
             patient.CreatedAt = DateTime.UtcNow;
@@ -62,22 +50,14 @@ namespace ClinicManagement.DAL.Repositories
         }
 
 
-        /// <summary>
-        /// Asynchronously updates an existing patient in the database.
-        /// </summary>
-        /// <param name="patient">The <see cref="Patient"/> entity with updated values.</param>
-        /// <returns>A task representing the asynchronous operation.</returns>
+        /// <inheritdoc/>
         public async Task UpdateAsync(Patient patient)
         {
             _context.Patients.Update(patient);
             await _context.SaveChangesAsync();
         }
 
-        /// <summary>
-        /// Asynchronously performs a soft delete on a patient, marking them as deleted but not removing from the database.
-        /// </summary>
-        /// <param name="id">The unique identifier of the patient to soft delete.</param>
-        /// <returns>A task representing the asynchronous operation.</returns>
+        /// <inheritdoc/>
         public async Task SoftDeleteAsync(int id)
         {
             var patient = await _context.Patients.FirstOrDefaultAsync(p => p.Id == id && !p.IsDeleted);
