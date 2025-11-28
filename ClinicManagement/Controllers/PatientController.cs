@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using ClinicManagement.DTOs.PatientRequests;
 using Serilog;
+using Microsoft.AspNetCore.Authorization;
+
 
 namespace ClinicManagement.Controllers
 {
@@ -13,6 +15,7 @@ namespace ClinicManagement.Controllers
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize] // All patient operations require authentication
     public class PatientController : ControllerBase
     {
         private readonly IUnitOfWork _unitOfWork;
@@ -26,6 +29,7 @@ namespace ClinicManagement.Controllers
         /// Gets the list of all active patients (not deleted).
         /// </summary>
         [HttpGet]
+        [Authorize(Roles = "Admin,Doctor,Receptionist")] // All roles can list patients
         public async Task<ActionResult<IEnumerable<Patient>>> GetPatients()
         {
             var patients = await _unitOfWork.Patients.GetAllAsync();
@@ -48,6 +52,7 @@ namespace ClinicManagement.Controllers
         /// Gets a patient by unique identifier if not deleted.
         /// </summary>
         [HttpGet("{id}")]
+        [Authorize(Roles = "Admin,Doctor,Receptionist")] // All roles can view patient details
         public async Task<ActionResult<Patient>> GetPatient(int id)
         {
             var patient = await _unitOfWork.Patients.GetByIdAsync(id);
@@ -70,6 +75,7 @@ namespace ClinicManagement.Controllers
         /// Creates a new patient record.
         /// </summary>
         [HttpPost]
+        [Authorize(Roles = "Admin,Receptionist")] // Receptionist creates patients, Admin has full control
         public async Task<IActionResult> CreatePatient([FromBody] CreatePatientDto dto)
         {
             var patient = new Patient
@@ -94,6 +100,7 @@ namespace ClinicManagement.Controllers
         /// Updates an existing patient record.
         /// </summary>
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin,Receptionist")] // Admin full control, Receptionist manages patients
         public async Task<IActionResult> UpdatePatient(int id, [FromBody] UpdatePatientDto dto)
         {
             var patient = await _unitOfWork.Patients.GetByIdAsync(id);
@@ -114,6 +121,7 @@ namespace ClinicManagement.Controllers
         /// Soft deletes a patient record (marks as deleted, does not remove from DB).
         /// </summary>
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")] // Only Admin can soft-delete patients
         public async Task<IActionResult> SoftDeletePatient(int id,[FromBody] SoftDeletePatientDto dto)
         {
             var patient = await _unitOfWork.Patients.GetByIdAsync(id);

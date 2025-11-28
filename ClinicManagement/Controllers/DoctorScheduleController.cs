@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using ClinicManagement.DAL.UnitOfWork;
 using ClinicManagement.DTOs.DoctorScheduleRequests;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ClinicManagement.Controllers
 {
@@ -16,6 +17,7 @@ namespace ClinicManagement.Controllers
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize] // Require authentication for all actions
     public class DoctorScheduleController : ControllerBase
     {
         private readonly IUnitOfWork _unitOfWork;
@@ -36,6 +38,7 @@ namespace ClinicManagement.Controllers
         /// <returns>A list of all doctor schedules.</returns>
         // GET: api/DoctorSchedule
         [HttpGet]
+        [Authorize(Roles = "Admin")] // Only Admin views all schedules
         public async Task<ActionResult<IEnumerable<DoctorScheduleAllDto>>> GetAll()
         {
             var schedules = await _unitOfWork.DoctorSchedules.GetAllAsync();
@@ -60,6 +63,7 @@ namespace ClinicManagement.Controllers
         /// <returns>The doctor schedule matching the provided ID.</returns>
         // GET: api/DoctorSchedule/5
         [HttpGet("{id}")]
+        [Authorize(Roles = "Admin")] // Only Admin views specific schedule details
         public async Task<ActionResult<DoctorScheduleDetailDto>> GetById(int id)
         {
             var schedule = await _unitOfWork.DoctorSchedules.GetByIdAsync(id);
@@ -86,6 +90,7 @@ namespace ClinicManagement.Controllers
         /// <returns>A list of schedules for the specified doctor.</returns>
         // GET: api/DoctorSchedule/ByDoctor/5
         [HttpGet("ByDoctor/{doctorId}")]
+        [Authorize(Roles = "Admin,Receptionist")] // Receptionist needs schedules for booking
         public async Task<ActionResult<IEnumerable<DoctorScheduleByDoctorDto>>> GetByDoctor(int doctorId)
         {
             var schedules = await _unitOfWork.DoctorSchedules.GetByDoctorIdAsync(doctorId);
@@ -110,6 +115,7 @@ namespace ClinicManagement.Controllers
         /// <returns>A response indicating the result of the create operation, along with the created schedule.</returns>
         // POST: api/DoctorSchedule
         [HttpPost]
+        [Authorize(Roles = "Admin")] // Only Admin defines schedules
         public async Task<ActionResult> Create([FromBody] CreateDoctorScheduleDto dto)
         {
             var schedule = new DoctorSchedule
@@ -134,6 +140,7 @@ namespace ClinicManagement.Controllers
         /// <returns>A response indicating the result of the update operation.</returns>
         // PUT: api/DoctorSchedule/5
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")] // Only Admin modifies schedules
         public async Task<ActionResult> Update(int id, UpdateDoctorScheduleDto dto)
         {
 
@@ -167,6 +174,7 @@ namespace ClinicManagement.Controllers
         /// <returns>A response indicating the result of the delete operation.</returns>
         // DELETE: api/DoctorSchedule/5
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")] // Only Admin deletes schedules
         public async Task<ActionResult> Delete([FromBody] DeleteDoctorScheduleDto dto)
         {
             var schedule = await _unitOfWork.DoctorSchedules.GetByIdAsync(dto.Id);

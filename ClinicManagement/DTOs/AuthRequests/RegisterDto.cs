@@ -19,5 +19,7 @@
         /// The full name of the new user.
         /// </summary>
         public string FullName { get; set; }
+
+        public string Role { get; set; } = "Receptionist"; // Optional: default Receptionist
     }
 }

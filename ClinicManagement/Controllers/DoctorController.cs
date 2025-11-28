@@ -5,6 +5,7 @@ using ClinicManagement.DAL.UnitOfWork;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using ClinicManagement.DTOs.DoctorRequests;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ClinicManagement.Controllers
 {
@@ -14,6 +15,7 @@ namespace ClinicManagement.Controllers
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize] // Require authentication for all actions
     public class DoctorController : ControllerBase
     {
         private readonly IUnitOfWork _unitOfWork;
@@ -33,6 +35,7 @@ namespace ClinicManagement.Controllers
         /// <returns>An <see cref="IActionResult"/> containing the collection of doctors.</returns>
         // GET: api/doctor
         [HttpGet]
+        [Authorize(Roles = "Admin")] // Only Admin allowed
         public async Task<IActionResult> GetAllDoctors()
         {
             var doctors = await _unitOfWork.Doctors.GetAllDoctorsAsync();
@@ -53,6 +56,7 @@ namespace ClinicManagement.Controllers
         /// <param name="id">The unique identifier of the doctor.</param>
         /// <returns>An <see cref="IActionResult"/> containing the doctor if found; otherwise, NotFound.</returns>
         [HttpGet("{id}")]
+        [Authorize(Roles = "Admin,Doctor")]
         public async Task<IActionResult> GetDoctorById(int id)
         {
             var doctor = await _unitOfWork.Doctors.GetDoctorByIdAsync(id);
@@ -78,6 +82,7 @@ namespace ClinicManagement.Controllers
         /// <returns>An <see cref="IActionResult"/> with the created doctor’s data and location.</returns>
         // POST: api/doctor
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> AddDoctor([FromBody] CreateDoctorDto dto)
         {
             if (!ModelState.IsValid)
@@ -105,6 +110,7 @@ namespace ClinicManagement.Controllers
         /// <returns>An <see cref="IActionResult"/> indicating the update result.</returns>
         // PUT : api/doctor/{id}
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateDoctor(int id, [FromBody] UpdateDoctorDto dto)
         {
             if (!ModelState.IsValid)
@@ -132,6 +138,7 @@ namespace ClinicManagement.Controllers
         /// <returns>An <see cref="IActionResult"/> indicating the deletion result.</returns>
         // DELETE: api/doctor/{id}
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteDoctor([FromBody] DeleteDoctorDto dto)
         {
             var existingDoctor = await _unitOfWork.Doctors.GetDoctorByIdAsync(dto.Id);

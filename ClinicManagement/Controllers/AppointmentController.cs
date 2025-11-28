@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using ClinicManagement.DTOs.AppointmentRequests;
 using System.Linq;
 using Serilog;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ClinicManagement.Controllers
 {
@@ -15,6 +16,7 @@ namespace ClinicManagement.Controllers
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class AppointmentController : ControllerBase
     {
         /// <summary>
@@ -42,6 +44,7 @@ namespace ClinicManagement.Controllers
         /// </returns>
         // Receptionist/Admin: Create a new appointment
         [HttpPost]
+        [Authorize(Roles = "Admin,Receptionist")] // Receptionist and Admin create appointments
         public async Task<IActionResult> CreateAppointment([FromBody] CreateAppointmentDto dto)
         {
             var appointment = new Appointment
@@ -68,6 +71,7 @@ namespace ClinicManagement.Controllers
         /// </returns>
         // Receptionist: Reschedule an appointment
         [HttpPut("{id}/reschedule")]
+        [Authorize(Roles = "Receptionist")]
         public async Task<IActionResult> RescheduleAppointment(int id, [FromBody] RescheduleAppointmentDto dto)
         {
             var appointment = await _unitOfWork.Appointments.GetByIdAsync(id);
@@ -90,6 +94,7 @@ namespace ClinicManagement.Controllers
         /// </returns>
         // Receptionist: Cancel an appointment
         [HttpPut("{id}/cancel")]
+        [Authorize(Roles = "Receptionist")]
         public async Task<IActionResult> CancelAppointment(int id, [FromBody] AppointmentCancelDto dto)
         {
             var appointment = await _unitOfWork.Appointments.GetByIdAsync(id);
@@ -118,6 +123,7 @@ namespace ClinicManagement.Controllers
         /// </returns>
         // Doctor: View own appointments
         [HttpGet("doctor/{doctorId}")]
+        [Authorize(Roles = "Doctor")]
         public async Task<IActionResult> GetDoctorAppointments(int doctorId)
         {
             var appointments = await _unitOfWork.Appointments.GetByDoctorIdAsync(doctorId);
@@ -145,6 +151,7 @@ namespace ClinicManagement.Controllers
         /// </returns>
         // Doctor: Mark appointment as completed
         [HttpPut("{id}/complete")]
+        [Authorize(Roles = "Doctor")]
         public async Task<IActionResult> MarkAppointmentCompleted(int id, [FromBody] MarkAppointmentCompleteDto dto)
         {
             var appointment = await _unitOfWork.Appointments.GetByIdAsync(id);
@@ -172,6 +179,7 @@ namespace ClinicManagement.Controllers
         /// </returns>
         // Admin: View all appointments
         [HttpGet("all")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAllAppointments()
         {
             var appointments = await _unitOfWork.Appointments.GetAllAsync();
@@ -202,6 +210,7 @@ namespace ClinicManagement.Controllers
         /// </returns>
         // Get appointment by id
         [HttpGet("{id}")]
+        [Authorize(Roles = "Admin,Receptionist,Doctor")]
         public async Task<IActionResult> GetAppointmentById(int id)
         {
             var appointment = await _unitOfWork.Appointments.GetByIdAsync(id);

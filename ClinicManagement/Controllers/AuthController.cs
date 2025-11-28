@@ -16,6 +16,7 @@ namespace ClinicManagement.Controllers
     /// </summary>
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class AuthController : ControllerBase
     {
         private readonly UserManager<ApplicationUser> _userManager;
@@ -45,6 +46,7 @@ namespace ClinicManagement.Controllers
         /// <param name="dto">Registration data transfer object.</param>
         /// <returns>Basic user details and assigned roles if successful, error details otherwise.</returns>
         [HttpPost("register")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Register(RegisterDto dto)
         {
             var user = new ApplicationUser
@@ -61,8 +63,13 @@ namespace ClinicManagement.Controllers
                 return BadRequest(result.Errors);
             }
 
+            // Role validation and assignment here
+            var validRoles = new[] { "Admin", "Doctor", "Receptionist" };
+            if (!validRoles.Contains(dto.Role))
+                return BadRequest("Invalid role");
+
             // Assign default role Receptionist
-            await _userManager.AddToRoleAsync(user, "Receptionist");
+            await _userManager.AddToRoleAsync(user, dto.Role);
 
             // fetch assigned role from backend
             var roles = await _userManager.GetRolesAsync(user);
@@ -90,6 +97,7 @@ namespace ClinicManagement.Controllers
         /// <param name="dto">Login data transfer object.</param>
         /// <returns>JWT token, expiration, user details, and roles if authenticated; error otherwise.</returns>
         [HttpPost("login")]
+        [AllowAnonymous]
         public async Task<IActionResult> Login(LoginDto dto)
         {
             var user = await _userManager.FindByEmailAsync(dto.Email);
