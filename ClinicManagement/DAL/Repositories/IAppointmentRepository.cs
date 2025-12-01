@@ -67,6 +67,9 @@ namespace ClinicManagement.DAL.Repositories
         /// </summary>
         /// <param name="appointment">The appointment entity to delete.</param>
         void Delete(Appointment appointment);
+
+
+        public IQueryable<Appointment> GetAll();
     }
 
 }

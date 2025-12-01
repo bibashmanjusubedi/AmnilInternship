@@ -71,5 +71,14 @@ namespace ClinicManagement.DAL.Repositories
         {
             _context.Appointments.Remove(appointment);
         }
+
+
+        public IQueryable<Appointment> GetAll()
+        {
+            return _context.Appointments
+                .Include(a => a.Patient)
+                .Include(a => a.Doctor);
+        }
+
     }
 }

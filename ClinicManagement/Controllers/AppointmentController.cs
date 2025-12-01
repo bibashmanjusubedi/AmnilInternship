@@ -1,12 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using ClinicManagement.Models;
-using ClinicManagement.DAL.UnitOfWork;
-using System;
-using System.Threading.Tasks;
+﻿using ClinicManagement.DAL.UnitOfWork;
 using ClinicManagement.DTOs.AppointmentRequests;
-using System.Linq;
-using Serilog;
+using ClinicManagement.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Serilog;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using Microsoft.EntityFrameworkCore;
 
 namespace ClinicManagement.Controllers
 {
@@ -180,9 +182,67 @@ namespace ClinicManagement.Controllers
         // Admin: View all appointments
         [HttpGet("all")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> GetAllAppointments()
+        public async Task<IActionResult> GetAllAppointments(
+            [FromQuery] int pageNumber =1,
+            [FromQuery] int pageSize = 10,
+            [FromQuery] string? sortBy  = "AppointmentDate",
+            [FromQuery] string? sortOrder = "asc",
+            [FromQuery] string? patientName = null,
+            [FromQuery] string? doctorName = null,
+            [FromQuery] AppointmentStatus? status =null,
+            [FromQuery] DateTime? fromDate = null,
+            [FromQuery] DateTime? toDate =null)
         {
-            var appointments = await _unitOfWork.Appointments.GetAllAsync();
+            
+            var query =_unitOfWork.Appointments.GetAll();
+
+            // Advanced search filters
+            if (!string.IsNullOrWhiteSpace(patientName))
+            {
+                query = query.Where(a => a.Patient != null &&
+                              ((a.Patient.FirstName + " " + a.Patient.LastName).Contains(patientName)));
+            }
+            if (!string.IsNullOrWhiteSpace(doctorName))
+            {
+                query = query.Where(a => a.Doctor != null &&
+                    a.Doctor.FullName.Contains(doctorName));
+            }
+            if (status.HasValue)
+            {
+                query = query.Where(a => a.Status == status.Value);
+            }
+            if (fromDate.HasValue)
+            {
+                query = query.Where(a => a.AppointmentDate >= fromDate.Value);
+            }
+            if (toDate.HasValue)
+            {
+                query = query.Where(a => a.AppointmentDate <= toDate.Value);
+            }
+
+
+            // Sorting
+            bool ascending = sortOrder?.ToLower() == "asc";
+            query = sortBy?.ToLower() switch
+            {
+                "patientname" => ascending ? query.OrderBy(a => a.Patient.FirstName).ThenBy(a => a.Patient.LastName)
+                                           : query.OrderByDescending(a => a.Patient.FirstName).ThenByDescending(a => a.Patient.LastName),
+                "doctorname" => ascending ? query.OrderBy(a => a.Doctor.FullName)
+                                          : query.OrderByDescending(a => a.Doctor.FullName),
+                "status" => ascending ? query.OrderBy(a => a.Status)
+                                          : query.OrderByDescending(a => a.Status),
+                "createdat" => ascending ? query.OrderBy(a => a.CreatedAt)
+                                          : query.OrderByDescending(a => a.CreatedAt),
+                _ => ascending ? query.OrderBy(a => a.AppointmentDate)
+                                          : query.OrderByDescending(a => a.AppointmentDate),
+            };
+
+            // Pagination
+            var totalRecords = await query.CountAsync();
+            var appointments = await query
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
 
             var appointmentDtos = appointments.Select(a => new AppointmentAllDto
             {
@@ -197,7 +257,13 @@ namespace ClinicManagement.Controllers
                 CreatedAt = a.CreatedAt
             }).ToList();
 
-            return Ok(appointmentDtos);
+            return Ok(new
+            {
+                TotalRecords = totalRecords,
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                Data = appointmentDtos
+            });
         }
 
 
