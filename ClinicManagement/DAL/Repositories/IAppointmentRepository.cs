@@ -68,7 +68,10 @@ namespace ClinicManagement.DAL.Repositories
         /// <param name="appointment">The appointment entity to delete.</param>
         void Delete(Appointment appointment);
 
-
+        /// <summary>
+        /// Returns a queryable collection of all appointments, including related patient
+        /// and doctor data, allowing callers to apply additional filtering, sorting,
+        /// and pagination before execution.
         public IQueryable<Appointment> GetAll();
     }
 

@@ -174,10 +174,19 @@ namespace ClinicManagement.Controllers
         }
 
         /// <summary>
-        /// Admin: Retrieves all appointments in the system.
+        /// Retrieves a paginated, sortable, and filterable list of all appointments in the system for administrators.
         /// </summary>
+        /// <param name="pageNumber">The page number to retrieve (1-based).</param>
+        /// <param name="pageSize">The number of appointments per page.</param>
+        /// <param name="sortBy">Field to sort the results by (e.g., "AppointmentDate", "patientname", "doctorname", "status", "createdat").</param>
+        /// <param name="sortOrder">Sorting direction: "asc" for ascending or "desc" for descending.</param>
+        /// <param name="patientName">Optional. Filter results by matching the patient's full name (first and last concatenated).</param>
+        /// <param name="doctorName">Optional. Filter results by matching the doctor's name.</param>
+        /// <param name="status">Optional. Filter results by appointment status.</param>
+        /// <param name="fromDate">Optional. Filter appointments scheduled on or after this date.</param>
+        /// <param name="toDate">Optional. Filter appointments scheduled on or before this date.</param>
         /// <returns>
-        /// <see cref="OkObjectResult"/> containing all appointment entities.
+        /// An <see cref="OkObjectResult"/> containing the total record count, current page information, and a list of returned appointment DTOs.
         /// </returns>
         // Admin: View all appointments
         [HttpGet("all")]

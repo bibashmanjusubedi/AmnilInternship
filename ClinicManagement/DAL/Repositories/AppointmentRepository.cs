@@ -72,7 +72,7 @@ namespace ClinicManagement.DAL.Repositories
             _context.Appointments.Remove(appointment);
         }
 
-
+        /// <inheritdoc/>
         public IQueryable<Appointment> GetAll()
         {
             return _context.Appointments
